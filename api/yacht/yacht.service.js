@@ -5,10 +5,10 @@ const logger = require('../../services/logger.service')
 
 
 async function query(filterBy = {}) {
-    const criteria = _buildCriteria(filterBy)
+    // const criteria = _buildCriteria(filterBy)
     try {
         const collection = await dbService.getCollection('yacht')
-        const yachts = await collection.find(criteria).toArray()
+        const yachts = await collection.find().toArray()
         return yachts
             // var yachts = await collection.aggregate([
             //     {
@@ -49,27 +49,35 @@ async function query(filterBy = {}) {
 
 async function remove(yachtId) {
     try {
-        const store = asyncLocalStorage.getStore()
-        const {
-            userId
-        } = store
         const collection = await dbService.getCollection('yacht')
-            // remove only if user is owner/admin
-        const query = {
-            _id: ObjectId(yachtId)
-        }
-        const yacht = await collection.findOne({
-            "_id": ObjectId(yachtId)
-        })
-        if (yacht.owner._id !== userId) res.status(401).send({
-            err: 'Failed to Delete'
-        })
-        await collection.deleteOne(query)
-            // return await collection.deleteOne({ _id: ObjectId(reviewId), byUserId: ObjectId(userId) })
+        await collection.deleteOne({ _id: ObjectId(yachtId) })
     } catch (err) {
         logger.error(`cannot remove yacht ${yachtId}`, err)
         throw err
     }
+
+    // try { \\זה ,נאים כשיהיה לנו מש,משים ובעלים
+    //     const store = asyncLocalStorage.getStore()
+    //     const {
+    //         userId
+    //     } = store
+    //     const collection = await dbService.getCollection('yacht')
+    //         // remove only if user is owner/admin
+    //     const query = {
+    //         _id: ObjectId(yachtId)
+    //     }
+    //     const yacht = await collection.findOne({
+    //         "_id": ObjectId(yachtId)
+    //     })
+    //     if (yacht.owner._id !== userId) res.status(401).send({
+    //         err: 'Failed to Delete'
+    //     })
+    //     await collection.deleteOne(query)
+    //         // return await collection.deleteOne({ _id: ObjectId(reviewId), byUserId: ObjectId(userId) })
+    // } catch (err) {
+    //     logger.error(`cannot remove yacht ${yachtId}`, err)
+    //     throw err
+    // }
 }
 
 async function add(yacht) {
@@ -77,7 +85,6 @@ async function add(yacht) {
         const collection = await dbService.getCollection('yacht') //bring the collection
         await collection.insertOne(yacht)
         return yacht
-
     } catch (err) {
         logger.error('cannot insert toy', err)
         throw err
@@ -101,9 +108,7 @@ async function update(yacht) {
             summary: yacht.summary
         }
         const collection = await dbService.getCollection('yacht')
-        await collection.updateOne({
-            "_id": ObjectId(yacht._id)
-        }, {
+        await collection.updateOne({ "_id": ObjectId(yacht._id) }, {
             $set: yachtToAdd
         })
         return yacht;

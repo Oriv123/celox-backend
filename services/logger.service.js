@@ -20,7 +20,7 @@ function isError(e) {
 
 function doLog(level, ...args) {
 
-    console.log('LOGGER:', args);
+    // console.log('LOGGER:', args);
     const strs = args.map(arg =>
         (typeof arg === 'string') ? arg :
         (isError(arg)) ? arg : JSON.stringify(arg))

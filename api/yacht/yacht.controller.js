@@ -13,6 +13,7 @@ async function getYachts(req, res) {
 
 async function getYachtById(req, res) {
     try {
+        console.log(req.params);
         const yachtId = req.params.yachtId
         const yacht = await yachtService.getById(yachtId)
         res.json(yacht)
@@ -27,6 +28,7 @@ async function getYachtById(req, res) {
 async function deleteYacht(req, res) {
     try {
         await yachtService.remove(req.params.yachtId)
+        console.log(req.params.yachtId, 'service');
         res.send({ msg: 'Deleted successfully' })
     } catch (err) {
         logger.error('Failed to delete yacht', err)
@@ -36,23 +38,33 @@ async function deleteYacht(req, res) {
 
 async function addYacht(req, res) {
     try {
-        var yacht = req.body
-        const { _id, fullname, imgUrl } = req.session.user
-        yacht.owner = { _id, fullname, imgUrl }
-        yacht = await yachtService.add(yacht)
-        console.log('CTRL SessionId:', req.sessionID);
-        res.send(yacht)
+        const { name, price, imgUrls, size, amenities, _id, favorites, owner, loc, reviews, summary } = req.body
+        const yacht = { name, price, imgUrls, size, amenities, _id, favorites, owner, loc, reviews, summary }
+        console.log(yacht, 'controler');
+        const newYacht = await yachtService.add(yacht)
+        res.send(newYacht)
     } catch (err) {
-        console.log(err)
-        logger.error('Failed to add review', err)
         res.status(500).send({ err: 'Failed to add review' })
     }
+    // try {\\זה ,נאים כשיהיה לנו מש,משים ובעלי
+    //     var yacht = req.body
+    //     const { _id, fullname, imgUrl } = req.session.user
+    //     yacht.owner = { _id, fullname, imgUrl }
+    //     yacht = await yachtService.add(yacht)
+    //     console.log('CTRL SessionId:', req.sessionID);
+    //     res.send(yacht)
+    // } catch (err) {
+    //     console.log(err)
+    //     logger.error('Failed to add review', err)
+    //     res.status(500).send({ err: 'Failed to add review' })
+    // }
 }
 
 async function updateYacht(req, res) {
     try {
         const { name, price, imgUrls, size, amenities, _id, favorites, owner, loc, reviews, summary } = req.body
         const yacht = { name, price, imgUrls, size, amenities, _id, favorites, owner, loc, reviews, summary }
+        console.log(yacht, 'updateC');
         const savedYacht = await yachtService.update(yacht)
         res.json(savedYacht)
     } catch (err) {
